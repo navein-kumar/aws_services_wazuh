@@ -1,0 +1,46 @@
+sources:
+  cloudfront_logs:
+    type: "file"
+    include:
+      - "/tmp/cloudfront_unzipped_logs/*.gz"
+
+transforms:
+  parse_cloudfront:
+    type: "remap"
+    inputs: ["cloudfront_logs"]
+    source: |
+      fields = split!(.message, "\t")
+      .cf_date = fields[0]
+      .cf_time = fields[1]
+      .cf_edge_location = fields[2]
+      .cf_bytes = to_int!(fields[3])
+      .cf_client_ip = fields[4]
+      .cf_method = fields[5]
+      .cf_host = fields[6]
+      .cf_uri = fields[7]
+      .cf_status = to_int!(fields[8])
+      .cf_referer = fields[9]
+      .cf_user_agent = fields[10]
+      .cf_query_string = fields[11]
+      .cf_cookie = fields[12]
+      .cf_result_type = fields[13]
+      .cf_request_id = fields[14]
+      .cf_host_header = fields[15]
+      .cf_protocol = fields[16]
+      .cf_bytes_sent = to_int!(fields[17])
+      .cf_time_taken = to_float!(fields[18])
+      .timestamp = now()
+
+sinks:
+  elasticsearch_cloudfront:
+    type: "elasticsearch"
+    inputs: ["parse_cloudfront"]
+    endpoints: ["https://172.31.1.148:59200"]
+    auth:
+      user: "admin"
+      password: "pass"
+      strategy: "basic"
+    tls:
+      verify_certificate: false
+    bulk:
+      index: "ebz-cloudfront-%Y.%m.%d"
