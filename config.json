@@ -1,0 +1,12 @@
+{
+    "bucketName": "cloudflare-waf-prod-logs",
+    "logPrefix": "firewall-events",
+    "localFolder": "/tmp/unzipped_logs",
+    "lastDateFile": "/tmp/last_date.txt",
+    "maxJobs": 10,
+    "region": "ap-south-1",
+    "logFile": "/var/log/cf_s3_log.log",
+    "continuationTokenFile": "/tmp/token.txt",
+    "timezone": "IST",
+    "retentionDays": 2
+}
